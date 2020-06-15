@@ -1,0 +1,47 @@
+{
+    "name": "signify-nz/silverstripe-dependentrequiredfields",
+    "description": "SilverStripe vendor module providing a validator which allows for fields to be required based on the values of other fields.",
+    "type": "silverstripe-vendormodule",
+    "keywords": [
+        "silverstripe",
+        "cms",
+        "validator",
+        "dependent",
+        "required"
+    ],
+    "homepage": "https://github.com/signify-nz/silverstripe-dependentrequiredfields",
+    "readme": "https://github.com/signify-nz/silverstripe-dependentrequiredfields/README.md",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Guy Sartorelli",
+            "email": "guy.sartorelli@signify.co.nz",
+            "role": "Developer"
+        },
+        {
+            "name": "Signify Ltd",
+            "homepage": "https://www.signify.co.nz/"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/signify-nz/silverstripe-dependentrequiredfields/issues"
+    },
+    "require": {
+        "silverstripe/framework": "^4.0",
+        "silverstripe/vendor-plugin": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7",
+        "squizlabs/php_codesniffer": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Signify\\Forms\\": "src/"
+        }
+    },
+    "config": {
+        "process-timeout": 600
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}
