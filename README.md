@@ -17,10 +17,10 @@ __Composer:__
 ```
 
 ## Example Usage
-In the below example, we have fields with various levels of dependency on whether they are required or not.
-`AlwaysRequiredField` will be required regardless of the values of other fields.
-`ExactValueField` will only be required if the value of `DependencyField` exactly equals `someExactValue`.
-`StartsWithField` will only be required if the value of `DependencyField` starts with the string `some`.
+In the below example, we have fields with various levels of dependency on whether they are required or not.  
+`AlwaysRequiredField` will be required regardless of the values of other fields.  
+`ExactValueField` will only be required if the value of `DependencyField` exactly equals `someExactValue`.  
+`StartsWithField` will only be required if the value of `DependencyField` starts with the string `some`.  
 ```php
 <?php
     public function getCMSValidator() {
