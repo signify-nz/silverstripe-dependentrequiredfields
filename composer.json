@@ -39,7 +39,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Signify\\Forms\\": "src/"
+            "Signify\\": "src/"
         }
     },
     "config": {
