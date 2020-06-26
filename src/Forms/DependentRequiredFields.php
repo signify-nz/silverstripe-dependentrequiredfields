@@ -4,8 +4,6 @@ namespace Signify\Forms;
 
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\ArrayLib;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use Signify\ORM\SearchFilterableArrayList;
 
