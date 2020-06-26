@@ -5,7 +5,9 @@ namespace Signify\Forms;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\ArrayLib;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
+use Signify\ORM\SearchFilterableArrayList;
 
 /**
  * Dependent Required Fields allows you to set which fields need to be present before
@@ -72,26 +74,28 @@ class DependentRequiredFields extends RequiredFields {
 
         foreach ($this->dependentRequired as $fieldName => $filter) {
             $isRequired = false;
-            foreach ($filter as $key => $value) {
+            foreach ($filter as $key => $filterData) {
                 // Field is already required, no need to re-process.
                 if ($isRequired) {
                     break;
                 }
                 $dependencyFieldName = explode(':', $key)[0];
+                $dependencyValue = isset($data[$dependencyFieldName]) ? $data[$dependencyFieldName] : null;
                 $filterKey = str_replace($dependencyFieldName, 'Value', $key);
-                $tempField = DBField::create_field('Varchar', $data[$dependencyFieldName]);
-                $filterList = ArrayList::create([$tempField]);
-                $isRequired = $filterList->filter($filterKey, $value)->count() !== 0;
+                $tempField = DBField::create_field('Varchar', $dependencyValue);
+                $filterList = SearchFilterableArrayList::create([$tempField]);
+                $isRequired = $filterList->filter($filterKey, $filterData)->count() !== 0;
 
                 // Field is required but has no value
                 if ($isRequired && empty($data[$fieldName])) {
                     $formField = $fields->dataFieldByName($fieldName);
+                    $title = ($formField && !empty($formField->Title())) ? $formField->Title() : $fieldName;
                     $errorMessage = _t(
                         'SilverStripe\\Forms\\Form.FIELDISREQUIRED',
                         '{name} is required',
                         [
                             'name' => strip_tags(
-                                '"' . ($formField->Title() ? $formField->Title() : $fieldName) . '"'
+                                '"' . $title . '"'
                             )
                         ]
                     );
