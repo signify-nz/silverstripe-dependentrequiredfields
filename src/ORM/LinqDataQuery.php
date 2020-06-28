@@ -131,30 +131,48 @@ class LinqDataQuery extends DataQuery {
             if (!is_array($value)) {
                 $value = [$value];
             }
-            $matches = [true];
-            $count = 0;
-            while (!empty($matches[0])) {
-                preg_match($this->whereRegex, $key, $matches);
-                if (empty($matches[0])) {
-                    break;
-                }
+            preg_match_all($this->whereRegex, $key, $matches);
+            if (empty($matches[0])) {
+                continue;
+            }
+            for ($i = 0; $i < count($matches[0]); $i++) {
+                $this->where[] = $this->prepareWhereClosure($matches['field'][$i], $matches['operator'][$i], $value[$i]);
+            }
 
-                $key = str_replace($matches[0], '', $key);
-                if (array_key_exists($matches['operator'], $this->operatorMethods)) {
-                    $closure = $this->operatorMethods[$matches['operator']];
-                    $fieldName = $matches['field'];
-                    $compareTo = $value[$count];
-                    $this->where[] = function($obj) use ($closure, $fieldName, $compareTo) {
-                        $value = is_array($obj) ? $obj[$fieldName] : $obj->$fieldName;
-                        return $closure($value, $compareTo);
-                    };
-                } else {
-                    throw new \InvalidArgumentException("SQL Operation '{$matches['operator']}' not supported.");
-                }
+        }
+        return $this;
+    }
+
 
                 $count++;
             }
 
+    /**
+     * Prepare a closure to be used in a `where` LINQ query.
+     * @param string $fieldName
+     * @param string $operator
+     * @param mixed $compareTo
+     * @throws \InvalidArgumentException if a given SQL statement is not supported.
+     * @return \Closure
+     */
+    protected function prepareWhereClosure($fieldName, $operator, $compareTo) {
+        if (array_key_exists($operator, $this->operatorMethods)) {
+            $closure = $this->operatorMethods[$operator];
+            return function($obj) use ($closure, $fieldName, $compareTo) {
+                if (is_array($obj)) {
+                    if (isset($obj[$fieldName])) {
+                        $value = $obj[$fieldName];
+                    }
+                } else if (property_exists($obj, $fieldName) || isset($obj->$fieldName)) {
+                    $value = $obj->$fieldName;
+                }
+                if (!isset($value)) {
+                    return false;
+                }
+                return $closure($value, $compareTo);
+            };
+        } else {
+            throw new \InvalidArgumentException("SQL Operation '{$operator}' not supported.");
         }
     }
 
