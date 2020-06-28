@@ -216,7 +216,7 @@ class LinqDataQuery extends DataQuery {
                 return $closure($value, $compareTo);
             };
         } else {
-            throw new \InvalidArgumentException("SQL Operation '{$operator}' not supported.");
+            throw new \InvalidArgumentException("SQL Operation '{$operator}' is not supported.");
         }
     }
 
