@@ -29,7 +29,7 @@ class SearchFilterableArrayList extends ArrayList {
             $searchFilter = $this->createSearchFilter($filterKey, $filterData);
             $searchFilter->apply($linqQuery);
         }
-        return $linqQuery->execute();
+        return new SearchFilterableArrayList($linqQuery->execute());
     }
 
     /**
