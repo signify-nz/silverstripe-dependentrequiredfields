@@ -163,10 +163,10 @@ class DependentRequiredFieldsTest extends SapphireTest {
         static::assertFalse($result->isValid());
 
         // Errors should result from these.
-        self::assertFalse($this->resultIsError($flatResult, 'field2'));
+        self::assertTrue($this->resultIsError($flatResult, 'field2'));
 
         // No errors should result from these.
-        self::assertTrue($this->resultIsError($flatResult, 'field1'));
+        self::assertFalse($this->resultIsError($flatResult, 'field1'));
         self::assertFalse($this->resultIsError($flatResult, 'field3'));
         self::assertFalse($this->resultIsError($flatResult, 'field4'));
         self::assertFalse($this->resultIsError($flatResult, 'field5'));
