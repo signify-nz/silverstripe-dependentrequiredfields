@@ -94,6 +94,12 @@ class LinqDataQuery extends DataQuery {
         return $dummyDataObject->ClassName;
     }
 
+    /**
+     * Required to ensure some SearchFilters function correctly.
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\DataQuery::applyRelation()
+     * @see \SilverStripe\ORM\Filters\ExactMatchFilter::oneFilter
+     */
     public function applyRelation($relation, $linearOnly = false) {
         return $this->dataClass();
     }
@@ -114,7 +120,13 @@ class LinqDataQuery extends DataQuery {
         $this->source = $source;
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws \InvalidArgumentException if a given SQL statement is not supported.
+     * @see \SilverStripe\ORM\DataQuery::where()
+     */
     public function where($filter) {
+        // Add where clause closures based on the provided $filter.
         foreach ($filter as $key => $value) {
             if (!is_array($value)) {
                 $value = [$value];
@@ -147,7 +159,7 @@ class LinqDataQuery extends DataQuery {
     }
 
     /**
-     * Execute the query and return the result as {@link SS_Query} object.
+     * Execute the query and return the result as an array.
      *
      * @return ArrayList
      */
