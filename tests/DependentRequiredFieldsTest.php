@@ -217,7 +217,7 @@ class DependentRequiredFieldsTest extends SapphireTest {
      * @return boolean
      */
     protected function resultIsError($flatResult, $fieldName) {
-        return isset($flatResult['field3']) && $flatResult['field3'] === ValidationResult::TYPE_ERROR;
+        return isset($flatResult[$fieldName]) && $flatResult[$fieldName] === ValidationResult::TYPE_ERROR;
     }
 
 }
