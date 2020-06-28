@@ -143,9 +143,40 @@ class LinqDataQuery extends DataQuery {
         return $this;
     }
 
-
-                $count++;
+    /**
+     * {@inheritDoc}
+     * @throws \InvalidArgumentException if a given SQL statement is not supported.
+     * @see \SilverStripe\ORM\DataQuery::whereAny()
+     */
+    public function whereAny($filter)
+    {
+        // Create an array of where clause closures based on the provided $filter.
+        $whereAny = array();
+        foreach ($filter as $key => $value) {
+            if (!is_array($value)) {
+                $value = [$value];
             }
+            preg_match_all($this->whereRegex, $key, $matches);
+            if (empty($matches[0])) {
+                continue;
+            }
+            for ($i = 0; $i < count($matches[0]); $i++) {
+                $whereAny[] = $this->prepareWhereClosure($matches['field'][$i], $matches['operator'][$i], $value[$i]);
+            }
+
+        }
+        // Create a LINQ closure which returns true if any of the closures in $whereAny return true.
+        $this->where[] = function($obj) use ($whereAny) {
+            foreach ($whereAny as $closure) {
+                if ($closure($obj)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        return $this;
+    }
 
     /**
      * Prepare a closure to be used in a `where` LINQ query.
