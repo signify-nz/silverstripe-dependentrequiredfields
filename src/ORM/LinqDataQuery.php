@@ -210,16 +210,28 @@ class LinqDataQuery extends DataQuery {
     /**
      * Execute the query and return the result as an array.
      *
-     * @return ArrayList
+     * @return Array
      */
     public function execute()
     {
+        return $this->getFinalisedQuery()->toArray();
+    }
+
+    /**
+     * Note that $queriedColumns is not used in this context.
+     * @return Enumerable
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\DataQuery::getFinalisedQuery()
+     */
+    public function getFinalisedQuery($queriedColumns = NULL) {
         $list = Enumerable::from($this->getSource());
 
         foreach ($this->where as $closure) {
             $list = $list->where($closure);
         }
-        return new SearchFilterableArrayList($list->toArray());
+
+        return $list;
+    }
     }
 
     /**
