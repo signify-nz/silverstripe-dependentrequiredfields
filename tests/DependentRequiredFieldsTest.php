@@ -185,14 +185,14 @@ class DependentRequiredFieldsTest extends SapphireTest {
      * @see DependentRequiredFields::__construct()
      */
     protected function createForm(array $fields, array $requiredFields = []) : Form {
-        $fields = FieldList::create();
+        $fieldList = FieldList::create();
         foreach ($fields as $name => $value) {
-            $fields->add(TextField::create($name, $name, $value));
+            $fieldList->add(TextField::create($name, $name, $value));
         }
 
         $validator = new DependentRequiredFields($requiredFields);
 
-        return Form::create(null, 'test', $fields, null, $validator);
+        return Form::create(null, 'test', $fieldList, null, $validator);
     }
 
     /**
