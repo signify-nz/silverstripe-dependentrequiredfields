@@ -6,6 +6,8 @@ use SilverStripe\ORM\DataQuery;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use YaLinqo\Enumerable;
+use SilverStripe\ORM\Queries\SQLSelect;
+use SilverStripe\ORM\DataQueryManipulator;
 
 class LinqDataQuery extends DataQuery {
 
@@ -232,15 +234,367 @@ class LinqDataQuery extends DataQuery {
 
         return $list;
     }
+
+    /**
+     * @return Enumerable
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\DataQuery::query()
+     */
+    public function query()
+    {
+        return $this->getFinalisedQuery();
+    }
+    /**
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\DataQuery::count()
+     */
+    public function count()
+    {
+        return $this->getFinalisedQuery()->count();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\DataQuery::max()
+     */
+    public function max($field)
+    {
+        return $this->getFinalisedQuery()->max(function($obj) use ($field){
+            return is_array($obj) ? $obj[$field] : $obj->$field;
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\DataQuery::min()
+     */
+    public function min($field)
+    {
+        return $this->getFinalisedQuery()->min(function($obj) use ($field){
+            return is_array($obj) ? $obj[$field] : $obj->$field;
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\DataQuery::avg()
+     */
+    public function avg($field)
+    {
+        return $this->getFinalisedQuery()->average(function($obj) use ($field){
+            return is_array($obj) ? $obj[$field] : $obj->$field;
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\DataQuery::sum()
+     */
+    public function sum($field)
+    {
+        return $this->getFinalisedQuery()->sum(function($obj) use ($field){
+            return is_array($obj) ? $obj[$field] : $obj->$field;
+        });
     }
 
     /**
      * Not implemented as this is not required.
      * {@inheritDoc}
      * @throws \BadMethodCallException
-     * @see \SilverStripe\ORM\DataQuery::initialiseQuery()
+     * @see \SilverStripe\ORM\DataQuery::removeFilterOn()
      */
-    protected function initialiseQuery($source = null)
+    public function removeFilterOn($fieldExpression) {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::setQueriedColumns()
+     */
+    public function setQueriedColumns($queriedColumns)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::aggregate()
+     */
+    public function aggregate($expression)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::firstRow()
+     */
+    public function firstRow()
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::lastRow()
+     */
+    public function lastRow()
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::groupby()
+     */
+    public function groupby($groupby)
+    {
+        // TODO consider implementing this method.
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::having()
+     */
+    public function having($having) {
+        // TODO consider implementing this method.
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::sort()
+     */
+    public function sort($sort = null, $direction = null, $clear = true)
+    {
+        // TODO consider implementing this method.
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::reverseSort()
+     */
+    public function reverseSort()
+    {
+        // TODO consider implementing this method.
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::limit()
+     */
+    public function limit($limit, $offset = 0)
+    {
+        // TODO consider implementing this method.
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::distinct()
+     */
+    public function distinct($value)
+    {
+        // TODO consider implementing this method, but consider carefully how to determine distinction.
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::distinct()
+     */
+    public function subtract(DataQuery $subtractQuery, $field = 'ID')
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::column()
+     */
+    public function column($field = 'ID')
+    {
+        // TODO consider implementing this method.
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not required.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::selectField()
+     */
+    public function selectField($fieldExpression, $alias = null)
+    {
+        // TODO consider implementing this method.
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::sql()
+     */
+    public function sql(&$parameters = []) {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::disjunctiveGroup()
+     */
+    public function disjunctiveGroup()
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::conjunctiveGroup()
+     */
+    public function conjunctiveGroup()
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::innerJoin()
+     */
+    public function innerJoin($table, $onClause, $alias = null, $order = 20, $parameters = array())
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::leftJoin()
+     */
+    public function leftJoin($table, $onClause, $alias = null, $order = 20, $parameters = array())
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::applyRelationPrefix()
+     */
+    public static function applyRelationPrefix($relation)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::selectFromTable()
+     */
+    public function selectFromTable($table, $fields)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::addSelectFromTable()
+     */
+    public function addSelectFromTable($table, $fields)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::setQueryParam()
+     */
+    public function setQueryParam($key, $value)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::getQueryParam()
+     */
+    public function getQueryParam($key)
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::getQueryParams()
+     */
+    public function getQueryParams()
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::getDataQueryManipulators()
+     */
+    public function getDataQueryManipulators()
+    {
+        throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
+    }
+
+    /**
+     * Not implemented as this is not applicable.
+     * {@inheritDoc}
+     * @throws \BadMethodCallException
+     * @see \SilverStripe\ORM\DataQuery::pushQueryManipulator()
+     */
+    public function pushQueryManipulator(DataQueryManipulator $manipulator)
     {
         throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
     }
