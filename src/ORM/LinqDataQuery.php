@@ -67,16 +67,18 @@ class LinqDataQuery extends DataQuery {
             return in_array($a,$b);
         };
         $this->operatorMethods = [
-            '=' => function($a,$b){return $a == $b;},
+            '=' => function($a,$b){return is_null($b) ? $a === $b : $a == $b;},
             '>' => function($a,$b){return $a > $b;},
             '<' => function($a,$b){return $a < $b;},
             '>=' => function($a,$b){return $a >= $b;},
             '<=' => function($a,$b){return $a <= $b;},
-            '<>' => function($a,$b){return $a != $b;},
+            '<>' => function($a,$b){return is_null($b) ? $a !== $b : $a != $b;},
             'LIKE BINARY' => function($a,$b)use($like){return $like($a,$b,false);},
             'LIKE' => $like,
             'IN' => $in,
             'AGAINST' => $like,
+            'IS' => function($a,$b){return $a === $b;},
+            'IS NOT' => function($a,$b){return $a !== $b;},
         ];
     }
 
@@ -128,6 +130,12 @@ class LinqDataQuery extends DataQuery {
      * @see \SilverStripe\ORM\DataQuery::where()
      */
     public function where($filter) {
+        if (!is_array($filter)) {
+            if (strpos($filter, '?') === false && strpos($filter, 'NULL') !== false) {
+                $filter = str_replace('NULL', '?', $filter);
+            }
+            $filter = array($filter => null);
+        }
         // Add where clause closures based on the provided $filter.
         foreach ($filter as $key => $value) {
             if (!is_array($value)) {
