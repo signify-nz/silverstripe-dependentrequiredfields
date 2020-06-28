@@ -11,6 +11,8 @@ use Signify\Forms\DependentRequiredFields;
 
 class DependentRequiredFieldsTest extends SapphireTest {
 
+    protected $usesDatabase = false;
+
     protected $testFields = [
         'field1' => null,
         'field2' => null,
@@ -33,6 +35,9 @@ class DependentRequiredFieldsTest extends SapphireTest {
         'field4',
     ];
 
+    /**
+     * @useDatabase false
+     */
     public function testValidationFromConstructor() {
         $form = $this->createForm($this->testFields, $this->dependentRequiredFields);
 
@@ -57,6 +62,9 @@ class DependentRequiredFieldsTest extends SapphireTest {
         self::assertFalse($this->resultIsError($flatResult, 'Notrequired'));
     }
 
+    /**
+     * @useDatabase false
+     */
     public function testEmptyValidator() {
         $form = $this->createForm($this->testFields);
         $validator = $form->getValidator();
@@ -68,6 +76,9 @@ class DependentRequiredFieldsTest extends SapphireTest {
         static::assertTrue($result->isValid());
     }
 
+    /**
+     * @useDatabase false
+     */
     public function testValidationAddedLater() {
         $form = $this->createForm($this->testFields);
         $validator = $form->getValidator();
@@ -95,6 +106,9 @@ class DependentRequiredFieldsTest extends SapphireTest {
         self::assertFalse($this->resultIsError($flatResult, 'Notrequired'));
     }
 
+    /**
+     * @useDatabase false
+     */
     public function testValidationRemoved() {
         $form = $this->createForm($this->testFields, $this->dependentRequiredFields);
         $validator = $form->getValidator();
@@ -110,6 +124,9 @@ class DependentRequiredFieldsTest extends SapphireTest {
         static::assertTrue($result->isValid());
     }
 
+    /**
+     * @useDatabase false
+     */
     public function testRequiredFieldsWithoutDependencies() {
         $form = $this->createForm($this->testFields, $this->standardRequiredFields);
         $validator = $form->getValidator();
