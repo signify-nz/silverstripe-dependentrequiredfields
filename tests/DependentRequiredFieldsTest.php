@@ -1,6 +1,6 @@
 <?php
 
-namespace _modules\dependentrequiredfields\tests;
+namespace Signify\Tests;
 
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Forms\Form;
