@@ -148,6 +148,30 @@ class DependentRequiredFieldsTest extends SapphireTest {
         self::assertFalse($this->resultIsError($flatResult, 'field5'));
         self::assertFalse($this->resultIsError($flatResult, 'field6'));
         self::assertFalse($this->resultIsError($flatResult, 'Notrequired'));
+
+        // Test pre-existing adder and remover methods.
+        $validator->addRequiredField('field2');
+        $validator->addRequiredField('field5');
+        $validator->removeRequiredField('field1');
+        $validator->removeRequiredField('field4');
+
+        /* @var $result ValidationResult */
+        $result = $validator->validate();
+        $flatResult = $this->getFlatValidationResult($result);
+
+        // Validation should fail.
+        static::assertFalse($result->isValid());
+
+        // Errors should result from these.
+        self::assertFalse($this->resultIsError($flatResult, 'field2'));
+
+        // No errors should result from these.
+        self::assertTrue($this->resultIsError($flatResult, 'field1'));
+        self::assertFalse($this->resultIsError($flatResult, 'field3'));
+        self::assertFalse($this->resultIsError($flatResult, 'field4'));
+        self::assertFalse($this->resultIsError($flatResult, 'field5'));
+        self::assertFalse($this->resultIsError($flatResult, 'field6'));
+        self::assertFalse($this->resultIsError($flatResult, 'Notrequired'));
     }
 
     /**
