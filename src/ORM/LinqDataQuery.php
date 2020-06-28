@@ -160,6 +160,9 @@ class LinqDataQuery extends DataQuery {
      */
     public function whereAny($filter)
     {
+        if (!is_array($filter)) {
+            $filter = array($filter);
+        }
         // Create an array of where clause closures based on the provided $filter.
         $whereAny = array();
         foreach ($filter as $key => $value) {
@@ -207,7 +210,7 @@ class LinqDataQuery extends DataQuery {
                 } else if (property_exists($obj, $fieldName) || isset($obj->$fieldName)) {
                     $value = $obj->$fieldName;
                 }
-                if (!isset($value)) {
+                if (!array_key_exists('value', get_defined_vars())) {
                     return false;
                 }
                 return $closure($value, $compareTo);
