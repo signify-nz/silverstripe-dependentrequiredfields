@@ -9,6 +9,14 @@ use YaLinqo\Enumerable;
 use SilverStripe\ORM\Queries\SQLSelect;
 use SilverStripe\ORM\DataQueryManipulator;
 
+/**
+ * An object representing a query of data from a given source.
+ *
+ * For most purposes, this is not interchangable with a {@link DataQuery}. The intention of this
+ * class is to provide a way for SearchFilters to be used in {@link SearchFilterableArrayList}.
+ * This requires queries to be performed specifically against the items that have been provided as
+ * the source, without consulting the database.
+ */
 class LinqDataQuery extends DataQuery {
 
     /**
