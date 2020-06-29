@@ -132,10 +132,16 @@ class LinqDataQuery extends DataQuery {
 
     /**
      * {@inheritDoc}
+     * @param string|array|LinqDataQuery $filter Predicate(s) to set.
      * @throws \InvalidArgumentException if a given SQL statement is not supported.
      * @see \SilverStripe\ORM\DataQuery::where()
      */
     public function where($filter) {
+        if ($filter instanceof LinqDataQuery) {
+            $this->where = array_merge($this->where, $filter->where);
+            return $this;
+        }
+
         if (!is_array($filter)) {
             if (strpos($filter, '?') === false && strpos($filter, 'NULL') !== false) {
                 $filter = str_replace('NULL', '?', $filter);
@@ -161,11 +167,17 @@ class LinqDataQuery extends DataQuery {
 
     /**
      * {@inheritDoc}
+     * @param string|array|LinqDataQuery $filter Predicate(s) to set.
      * @throws \InvalidArgumentException if a given SQL statement is not supported.
      * @see \SilverStripe\ORM\DataQuery::whereAny()
      */
     public function whereAny($filter)
     {
+        if ($filter instanceof LinqDataQuery) {
+            $this->where[] = $this->wrapClosures($filter->where);
+            return $this;
+        }
+
         if (!is_array($filter)) {
             $filter = array($filter);
         }
@@ -185,16 +197,20 @@ class LinqDataQuery extends DataQuery {
 
         }
         // Create a LINQ closure which returns true if any of the closures in $whereAny return true.
-        $this->where[] = function($obj) use ($whereAny) {
-            foreach ($whereAny as $closure) {
+        $this->where[] = $this->wrapClosures($whereAny);
+
+        return $this;
+    }
+
+    protected function wrapClosures($closures) {
+        return function($obj) use ($closures) {
+            foreach ($closures as $closure) {
                 if ($closure($obj)) {
                     return true;
                 }
             }
             return false;
         };
-
-        return $this;
     }
 
     /**
