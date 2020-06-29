@@ -60,6 +60,9 @@ class LinqDataQuery extends DataQuery {
             if ($i) $regex.='i';
             return preg_match($regex, $a) == 1;
         };
+        $likeBinary = function($a,$b)use($like){
+            return $like($a,$b,false);
+        };
         $in = function($a,$b){
             if (is_string($b)) {
                 $b = explode(',',preg_replace('/[() ]/','',$b));
@@ -73,9 +76,12 @@ class LinqDataQuery extends DataQuery {
             '>=' => function($a,$b){return $a >= $b;},
             '<=' => function($a,$b){return $a <= $b;},
             '<>' => function($a,$b){return is_null($b) ? $a !== $b : $a != $b;},
-            'LIKE BINARY' => function($a,$b)use($like){return $like($a,$b,false);},
             'LIKE' => $like,
+            'NOT LIKE' => function($a,$b)use($like){return !$like($a,$b);},
+            'LIKE BINARY' => $likeBinary,
+            'NOT LIKE BINARY' => function($a,$b)use($likeBinary){return !$likeBinary($a,$b);},
             'IN' => $in,
+            'NOT IN' => function($a,$b)use($in){return !$in($a,$b);},
             'AGAINST' => $like,
             'IS' => function($a,$b){return $a === $b;},
             'IS NOT' => function($a,$b){return $a !== $b;},
