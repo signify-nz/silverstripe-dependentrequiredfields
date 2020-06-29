@@ -6,30 +6,107 @@ use SilverStripe\ORM\ArrayList;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\Filters\SearchFilter;
 
+/**
+ * An ArrayList implementation that can be filtered using SearchFilters.
+ *
+ * @see \SilverStripe\ORM\ArrayList
+ * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
+ */
 class SearchFilterableArrayList extends ArrayList {
 
     /**
-     * Filter the list to include items with these charactaristics.
-     * Note that search filters can also be used. See {@link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/}
+     * Find the first item of this list where the given key = value
+     * Note that search filters can also be used.
      *
-     * @return ArrayList
-     * @see SS_List::filter()
-     * @example $list->filter('Name', 'bob'); // only bob in the list
-     * @example $list->filter('Name', array('aziz', 'bob'); // aziz and bob in list
-     * @example $list->filter(array('Name'=>'bob, 'Age'=>21)); // bob with the Age 21 in list
-     * @example $list->filter(array('Name'=>'bob, 'Age'=>array(21, 43))); // bob with the Age 21 or 43
-     * @example $list->filter(array('Name'=>array('aziz','bob'), 'Age'=>array(21, 43)));
-     *          // aziz with the age 21 or 43 and bob with the Age 21 or 43
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\ArrayList::find()
+     * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
+     */
+    public function find($key, $value)
+    {
+        return $this->filter($key, $value)->first();
+    }
+
+    /**
+     * Filter the list to include items with these charactaristics.
+     * Note that search filters can also be used.
+     *
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\ArrayList::filter()
+     * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
      */
     public function filter()
     {
-        $linqQuery = new LinqDataQuery($this);
         $filters = call_user_func_array([$this, 'normaliseFilterArgs'], func_get_args());
+        $linqQuery = $this->createFilteredQuery($filters);
+        return new SearchFilterableArrayList($linqQuery->execute());
+    }
+
+    /**
+     * Return a copy of this list which contains items matching any of these charactaristics.
+     * Note that search filters can also be used.
+     *
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\ArrayList::filterAny()
+     * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
+     */
+    public function filterAny()
+    {
+        $filters = call_user_func_array([$this, 'normaliseFilterArgs'], func_get_args());
+        $subQuery = $this->createFilteredQuery($filters);
+        $linqQuery = new LinqDataQuery($this);
+        $linqQuery->whereAny($subQuery);
+        return new SearchFilterableArrayList($linqQuery->execute());
+    }
+
+    /**
+     * Exclude the list to not contain items with these charactaristics
+     * Note that search filters can also be used.
+     *
+     * {@inheritDoc}
+     * @see \SilverStripe\ORM\ArrayList::exclude()
+     * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
+     */
+    public function exclude()
+    {
+        $filters = call_user_func_array([$this, 'normaliseFilterArgs'], func_get_args());
+        $linqQuery = $this->createFilteredQuery($filters, false);
+        return new SearchFilterableArrayList($linqQuery->execute());
+    }
+
+    /**
+     * Exclude the list to not contain items matching any of these charactaristics
+     * Note that search filters can also be used.
+     *
+     * @see \Signify\ORM\SearchFilterableArrayList::exclude()
+     * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
+     */
+    public function excludeAny()
+    {
+        $filters = call_user_func_array([$this, 'normaliseFilterArgs'], func_get_args());
+        $subQuery = $this->createFilteredQuery($filters, false);
+        $linqQuery = new LinqDataQuery($this);
+        $linqQuery->whereAny($subQuery);
+        return new SearchFilterableArrayList($linqQuery->execute());
+    }
+
+    /**
+     * Create a linq query which has the provided filters applied.
+     *
+     * @param array $filters
+     * @return \Signify\ORM\LinqDataQuery
+     */
+    protected function createFilteredQuery($filters, $inclusive = true) {
+        $linqQuery = new LinqDataQuery($this);
         foreach ($filters as $filterKey => $filterData) {
             $searchFilter = $this->createSearchFilter($filterKey, $filterData);
-            $searchFilter->apply($linqQuery);
+            if ($inclusive) {
+                $searchFilter->apply($linqQuery);
+            } else {
+                $searchFilter->exclude($linqQuery);
+            }
         }
-        return new SearchFilterableArrayList($linqQuery->execute());
+        return $linqQuery;
     }
 
     /**
