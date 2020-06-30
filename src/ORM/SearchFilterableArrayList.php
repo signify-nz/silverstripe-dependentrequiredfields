@@ -70,7 +70,9 @@ class SearchFilterableArrayList extends ArrayList {
     public function exclude()
     {
         $filters = call_user_func_array([$this, 'normaliseFilterArgs'], func_get_args());
-        $linqQuery = $this->createFilteredQuery($filters, false);
+        $subQuery = $this->createFilteredQuery($filters, false);
+        $linqQuery = new LinqDataQuery($this);
+        $linqQuery->whereAny($subQuery);
         return new SearchFilterableArrayList($linqQuery->execute());
     }
 
@@ -84,9 +86,7 @@ class SearchFilterableArrayList extends ArrayList {
     public function excludeAny()
     {
         $filters = call_user_func_array([$this, 'normaliseFilterArgs'], func_get_args());
-        $subQuery = $this->createFilteredQuery($filters, false);
-        $linqQuery = new LinqDataQuery($this);
-        $linqQuery->whereAny($subQuery);
+        $linqQuery = $this->createFilteredQuery($filters, false);
         return new SearchFilterableArrayList($linqQuery->execute());
     }
 
