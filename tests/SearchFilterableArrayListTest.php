@@ -180,6 +180,41 @@ class SearchFilterableArrayListTest extends SapphireTest {
     /**
      * @useDatabase false
      */
+    public function testFilterAny() {
+        $list = new SearchFilterableArrayList($this->objects);
+
+        // FilterAny test that retains 3 objects.
+        $filterAny1 = $list->filterAny([
+            'GreaterThan100:GreaterThan' => 100,
+            'GreaterThan100:LessThan' => 100,
+        ]);
+        $filterAny1Retained = $filterAny1->column('Title');
+        self::assertCount(3, $filterAny1Retained, 'Three objects remain in the list.');
+        self::assertNotContains('Fourth Object', $filterAny1Retained);
+
+        // FilterAny test that retains 3 objects.
+        $filterAny2 = $list->filterAny([
+            'NoCase:not' => null,
+            'LessThan100' => 100,
+        ]);
+        $filterAny2Retained = $filterAny2->column('Title');
+        self::assertCount(3, $filterAny2Retained, 'Three objects remain in the list.');
+        self::assertNotContains('Third Object', $filterAny2Retained);
+
+        // FilterAny test that retains 2 objects.
+        $filterAny3 = $list->filterAny([
+            'StartsWithTest:StartsWith:case' => 'test',
+            'StartsWithTest:EndsWith:case' => 'test',
+        ]);
+        $filterAny3Retained = $filterAny3->column('Title');
+        self::assertCount(2, $filterAny3Retained, 'Two objects remain in the list.');
+        self::assertContains('Third Object', $filterAny3Retained);
+        self::assertContains('Fourth Object', $filterAny3Retained);
+    }
+
+    /**
+     * @useDatabase false
+     */
     public function testExclude() {
         $list = new SearchFilterableArrayList($this->objects);
 
@@ -208,6 +243,41 @@ class SearchFilterableArrayListTest extends SapphireTest {
             'Title' => 'No Object',
         ]);
         self::assertCount(4, $notExclude4->toArray(), 'No objects are excluded.');
+    }
+
+    /**
+     * @useDatabase false
+     */
+    public function testExcludeAny() {
+        $list = new SearchFilterableArrayList($this->objects);
+
+        // ExcludeAny test that retains 1 object.
+        $excludeAny1 = $list->excludeAny([
+            'GreaterThan100:GreaterThan' => 100,
+            'GreaterThan100:LessThan' => 100,
+        ]);
+        $excludeAny1Retained = $excludeAny1->column('Title');
+        self::assertCount(1, $excludeAny1Retained, 'One object remains in the list.');
+        self::assertContains('Fourth Object', $excludeAny1Retained);
+
+        // ExcludeAny test that retains 1 object.
+        $excludeAny2 = $list->excludeAny([
+            'NoCase:not' => null,
+            'LessThan100' => 100,
+        ]);
+        $excludeAny2Retained = $excludeAny2->column('Title');
+        self::assertCount(1, $excludeAny2Retained, 'One object remains in the list.');
+        self::assertContains('Third Object', $excludeAny2Retained);
+
+        // ExcludeAny test that retains 2 objects.
+        $excludeAny3 = $list->excludeAny([
+            'StartsWithTest:StartsWith:case' => 'test',
+            'StartsWithTest:EndsWith:case' => 'test',
+        ]);
+        $excludeAny3Retained = $excludeAny3->column('Title');
+        self::assertCount(2, $excludeAny3Retained, 'Two objects remain in the list.');
+        self::assertContains('First Object', $excludeAny3Retained);
+        self::assertContains('Second Object', $excludeAny3Retained);
     }
 
     protected function createDummyObject($fields) {
