@@ -4,7 +4,6 @@ namespace Signify\Forms;
 
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\ArrayLib;
-use SilverStripe\ORM\FieldType\DBField;
 use Signify\ORM\SearchFilterableArrayList;
 
 /**
@@ -72,16 +71,16 @@ class DependentRequiredFields extends RequiredFields {
 
         foreach ($this->dependentRequired as $fieldName => $filter) {
             $isRequired = false;
-            foreach ($filter as $key => $filterData) {
+            foreach ($filter as $filterKey => $filterData) {
                 // Field is already required, no need to re-process.
                 if ($isRequired) {
                     break;
                 }
-                $dependencyFieldName = explode(':', $key)[0];
+                $dependencyFieldName = explode(':', $filterKey)[0];
                 $dependencyValue = isset($data[$dependencyFieldName]) ? $data[$dependencyFieldName] : null;
-                $filterKey = str_replace($dependencyFieldName, 'Value', $key);
-                $tempField = DBField::create_field('Varchar', $dependencyValue);
-                $filterList = SearchFilterableArrayList::create([$tempField]);
+                $tempObj = new \stdClass();
+                $tempObj->$dependencyFieldName = $dependencyValue;
+                $filterList = SearchFilterableArrayList::create([$tempObj]);
                 $isRequired = $filterList->filter($filterKey, $filterData)->count() !== 0;
 
                 // Field is required but has no value
