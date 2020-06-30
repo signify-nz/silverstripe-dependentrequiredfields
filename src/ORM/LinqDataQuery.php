@@ -40,7 +40,7 @@ class LinqDataQuery extends DataQuery {
      * <li>placeholder - matches with ? or (?)</li></ul>
      * @var string
      */
-    protected $whereRegex = '/(MATCH \()?"(?<field>[a-zA-Z0-9_-]+?)"(?(1)\)|) (?<operator>[a-zA-Z<>= ]*?) (?<placeholder>(?(1)\(\?\)|\?))/';
+    protected $whereRegex = '/(MATCH \()?"(?<field>[a-zA-Z0-9_-]+?)"(?(1)\)|) (?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>(?(1)\(\?\)|\?))/';
 
     /**
      * An array of closure templates for where statements.
@@ -77,13 +77,15 @@ class LinqDataQuery extends DataQuery {
             }
             return in_array($a,$b);
         };
+        $not = function($a,$b){return is_null($b) ? $a !== $b : $a != $b;};
         $this->operatorMethods = [
             '=' => function($a,$b){return is_null($b) ? $a === $b : $a == $b;},
             '>' => function($a,$b){return $a > $b;},
             '<' => function($a,$b){return $a < $b;},
             '>=' => function($a,$b){return $a >= $b;},
             '<=' => function($a,$b){return $a <= $b;},
-            '<>' => function($a,$b){return is_null($b) ? $a !== $b : $a != $b;},
+            '<>' => $not,
+            '!=' => $not,
             'LIKE' => $like,
             'NOT LIKE' => function($a,$b)use($like){return !$like($a,$b);},
             'LIKE BINARY' => $likeBinary,
