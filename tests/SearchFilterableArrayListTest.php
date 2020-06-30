@@ -32,6 +32,7 @@ class SearchFilterableArrayListTest extends SapphireTest {
             ]),
             $this->createDummyObject([
                 'Title' => 'Third Object',
+                'NoCase' => null,
                 'StartsWithTest' => 'Does not start with test',
                 'GreaterThan100' => 99,
                 'LessThan100' => 99,
@@ -96,11 +97,18 @@ class SearchFilterableArrayListTest extends SapphireTest {
         $notFilter3 = $list->filter('Title:not', 'No Object');
         self::assertCount(4, $notFilter3->toArray(), 'All objects are retained.');
 
+        // Filter to test multiple value arguments which retains two objects.
+        $basicFilter1 = $list->filter('Title', ['First Object', 'Second Object']);
+        $basicFilter1Retained = $basicFilter1->column('Title');
+        self::assertCount(2, $basicFilter1Retained, 'Two objects remain in the list.');
+        self::assertContains('First Object', $basicFilter1Retained);
+        self::assertContains('Second Object', $basicFilter1Retained);
+
         // Simple filter which returns an empty list.
-        $notFilter4 = $list->filter([
+        $basicFilter2 = $list->filter([
             'Title', 'No Object',
         ]);
-        self::assertEmpty($notFilter4->toArray(), 'All objects are filtered out.');
+        self::assertEmpty($basicFilter2->toArray(), 'All objects are filtered out.');
     }
 
     public function testFilterAdvanced() {
