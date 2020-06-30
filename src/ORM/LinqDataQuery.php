@@ -40,7 +40,7 @@ class LinqDataQuery extends DataQuery {
      * <li>placeholder - matches with ? or (?)</li></ul>
      * @var string
      */
-    protected $whereRegex = '/(MATCH \()?"(?<field>[a-zA-Z0-9_-]+?)"(?(1)\)|) (?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>(?(1)\(\?\)|\?))/';
+    protected $whereRegex = '/(MATCH \()?"(?<field>[a-zA-Z0-9_-]+?)"(?(1)\)|) (?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>\(?[?, ]+\)?)/';
 
     /**
      * An array of closure templates for where statements.
@@ -72,9 +72,6 @@ class LinqDataQuery extends DataQuery {
             return $like($a,$b,false);
         };
         $in = function($a,$b){
-            if (is_string($b)) {
-                $b = explode(',',preg_replace('/[() ]/','',$b));
-            }
             return in_array($a,$b);
         };
         $not = function($a,$b){return is_null($b) ? $a !== $b : $a != $b;};
@@ -160,10 +157,7 @@ class LinqDataQuery extends DataQuery {
         }
         // Add where clause closures based on the provided $filter.
         foreach ($filter as $key => $value) {
-            if (!is_array($value)) {
-                $value = [$value];
-            }
-            preg_match_all($this->whereRegex, $key, $matches);
+            $this->findSqlMatches($key, $value, $matches);
             if (empty($matches[0])) {
                 continue;
             }
@@ -194,10 +188,7 @@ class LinqDataQuery extends DataQuery {
         // Create an array of where clause closures based on the provided $filter.
         $whereAny = array();
         foreach ($filter as $key => $value) {
-            if (!is_array($value)) {
-                $value = [$value];
-            }
-            preg_match_all($this->whereRegex, $key, $matches);
+            $this->findSqlMatches($key, $value, $matches);
             if (empty($matches[0])) {
                 continue;
             }
@@ -210,6 +201,29 @@ class LinqDataQuery extends DataQuery {
         $this->where[] = $this->wrapClosures($whereAny);
 
         return $this;
+    }
+
+    protected function findSqlMatches($key, &$value, &$matches) {
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+        preg_match_all($this->whereRegex, $key, $matches);
+        $count = 0;
+        foreach ($matches['placeholder'] as $placeholder) {
+            // Check for values that are actually meant to be an array of values.
+            $numValues = substr_count($placeholder, '?');
+            if ($numValues > 1) {
+                // Combine values into one index of the array.
+                $value[$count] = array_slice($value, $count, $numValues);
+                // Unset values which are now part of the current $i index of $value
+                for ($index = $count + 1; $index < count($value) && $index < $count + $numValues; $index++) {
+                    unset($value[$index]);
+                }
+                // Reset array indices
+                $value = array_merge($value);
+            }
+            $count++;
+        }
     }
 
     protected function wrapClosures($closures) {
