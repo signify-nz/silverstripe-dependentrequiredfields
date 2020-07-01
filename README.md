@@ -16,6 +16,14 @@ __Composer:__
     composer require signify-nz/silverstripe-dependentrequiredfields
 ```
 
+## Documentaion
+No configuration is required. See Example Usage below for an example of how this validator is used.
+
+* [Changelog](CHANGELOG.md)
+* [Contributing](CONTRIBUTING.md)
+* [Issues](https://github.com/signify-nz/silverstripe-dependentrequiredfields/issues)
+* [License](LICENSE.md)
+
 ## Example Usage
 In the below example, we have fields with various levels of dependency on whether they are required or not.  
 `AlwaysRequiredField` will be required regardless of the values of other fields.  
