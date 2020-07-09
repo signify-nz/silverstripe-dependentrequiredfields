@@ -41,7 +41,8 @@ class LinqDataQuery extends DataQuery
      * <li>placeholder - matches with ? or (?)</li></ul>
      * @var string
      */
-    protected $whereRegex = '/(MATCH \()?"(?<field>[a-zA-Z0-9_-]+?)"(?(1)\)|) (?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>\(?[?, ]+\)?)/';
+    protected $whereRegex = '/(MATCH \()?"(?<field>[a-zA-Z0-9_-]+?)"(?(1)\)|) '
+    . '(?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>\(?[?, ]+\)?)/';
 
     /**
      * An array of closure templates for where statements.
@@ -192,7 +193,11 @@ class LinqDataQuery extends DataQuery
                 continue;
             }
             for ($i = 0; $i < count($matches[0]); $i++) {
-                $this->where[] = $this->prepareWhereClosure($matches['field'][$i], $matches['operator'][$i], $value[$i]);
+                $this->where[] = $this->prepareWhereClosure(
+                    $matches['field'][$i],
+                    $matches['operator'][$i],
+                    $value[$i]
+                );
             }
         }
         return $this;
