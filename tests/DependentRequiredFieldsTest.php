@@ -9,7 +9,8 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\ValidationResult;
 use Signify\Forms\DependentRequiredFields;
 
-class DependentRequiredFieldsTest extends SapphireTest {
+class DependentRequiredFieldsTest extends SapphireTest
+{
 
     protected $usesDatabase = false;
 
@@ -38,7 +39,8 @@ class DependentRequiredFieldsTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testValidationFromConstructor() {
+    public function testValidationFromConstructor()
+    {
         $form = $this->createForm($this->testFields, $this->dependentRequiredFields);
 
         $validator = $form->getValidator();
@@ -65,7 +67,8 @@ class DependentRequiredFieldsTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testEmptyValidator() {
+    public function testEmptyValidator()
+    {
         $form = $this->createForm($this->testFields);
         $validator = $form->getValidator();
 
@@ -79,7 +82,8 @@ class DependentRequiredFieldsTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testValidationAddedLater() {
+    public function testValidationAddedLater()
+    {
         $form = $this->createForm($this->testFields);
         $validator = $form->getValidator();
 
@@ -109,7 +113,8 @@ class DependentRequiredFieldsTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testValidationRemoved() {
+    public function testValidationRemoved()
+    {
         $form = $this->createForm($this->testFields, $this->dependentRequiredFields);
         $validator = $form->getValidator();
 
@@ -127,7 +132,8 @@ class DependentRequiredFieldsTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testRequiredFieldsWithoutDependencies() {
+    public function testRequiredFieldsWithoutDependencies()
+    {
         $form = $this->createForm($this->testFields, $this->standardRequiredFields);
         $validator = $form->getValidator();
 
@@ -184,7 +190,8 @@ class DependentRequiredFieldsTest extends SapphireTest {
      * @return \SilverStripe\Forms\Form
      * @see DependentRequiredFields::__construct()
      */
-    protected function createForm(array $fields, array $requiredFields = []) : Form {
+    protected function createForm(array $fields, array $requiredFields = []): Form
+    {
         $fieldList = FieldList::create();
         foreach ($fields as $name => $value) {
             $fieldList->add(TextField::create($name, $name, $value));
@@ -200,7 +207,8 @@ class DependentRequiredFieldsTest extends SapphireTest {
      * @param ValidationResult $result
      * @return array
      */
-    protected function getFlatValidationResult(ValidationResult $result) {
+    protected function getFlatValidationResult(ValidationResult $result)
+    {
         $flatResults = array();
         foreach ($result->getMessages() as $key => $metadata) {
             $flatResults[$metadata['fieldName']] = $metadata['messageType'];
@@ -216,9 +224,8 @@ class DependentRequiredFieldsTest extends SapphireTest {
      * Name of the field to check.
      * @return boolean
      */
-    protected function resultIsError($flatResult, $fieldName) {
+    protected function resultIsError($flatResult, $fieldName)
+    {
         return isset($flatResult[$fieldName]) && $flatResult[$fieldName] === 'required';
     }
-
 }
-

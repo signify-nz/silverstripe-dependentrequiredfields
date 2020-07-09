@@ -12,7 +12,8 @@ use SilverStripe\ORM\Filters\SearchFilter;
  * @see \SilverStripe\ORM\ArrayList
  * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
  */
-class SearchFilterableArrayList extends ArrayList {
+class SearchFilterableArrayList extends ArrayList
+{
 
     /**
      * Find the first item of this list where the given key = value
@@ -96,7 +97,8 @@ class SearchFilterableArrayList extends ArrayList {
      * @param array $filters
      * @return \Signify\ORM\LinqDataQuery
      */
-    protected function createFilteredQuery($filters, $inclusive = true) {
+    protected function createFilteredQuery($filters, $inclusive = true)
+    {
         $linqQuery = new LinqDataQuery($this);
         foreach ($filters as $filterKey => $filterData) {
             $searchFilter = $this->createSearchFilter($filterKey, $filterData);
@@ -147,6 +149,4 @@ class SearchFilterableArrayList extends ArrayList {
         // Build instance
         return Injector::inst()->create($filterServiceName, $fieldName, $value, $modifiers);
     }
-
 }
-

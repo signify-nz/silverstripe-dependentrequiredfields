@@ -17,7 +17,8 @@ use SilverStripe\ORM\DataQueryManipulator;
  * This requires queries to be performed specifically against the items that have been provided as
  * the source, without consulting the database.
  */
-class LinqDataQuery extends DataQuery {
+class LinqDataQuery extends DataQuery
+{
 
     /**
      *
@@ -60,38 +61,62 @@ class LinqDataQuery extends DataQuery {
         $this->source = $source;
 
         // Set up closures to use in LINQ expressions.
-        $like = function($a,$b,$i=true){
+        $like = function ($a, $b, $i = true) {
             $b = preg_quote($b);
             $b = str_replace(preg_quote('%'), '.*', $b);
             $b = str_replace(preg_quote('_'), '.', $b);
-            $regex = '/^'.$b.'$/';
-            if ($i) $regex.='i';
+            $regex = '/^' . $b . '$/';
+            if ($i) {
+                $regex .= 'i';
+            }
             return preg_match($regex, $a) == 1;
         };
-        $likeBinary = function($a,$b)use($like){
-            return $like($a,$b,false);
+        $likeBinary = function ($a, $b) use ($like) {
+            return $like($a, $b, false);
         };
-        $in = function($a,$b){
-            return in_array($a,$b);
+        $in = function ($a, $b) {
+            return in_array($a, $b);
         };
-        $not = function($a,$b){return is_null($b) ? $a !== $b : $a != $b;};
+        $not = function ($a, $b) {
+            return is_null($b) ? $a !== $b : $a != $b;
+        };
         $this->operatorMethods = [
-            '=' => function($a,$b){return is_null($b) ? $a === $b : $a == $b;},
-            '>' => function($a,$b){return $a > $b;},
-            '<' => function($a,$b){return $a < $b;},
-            '>=' => function($a,$b){return $a >= $b;},
-            '<=' => function($a,$b){return $a <= $b;},
+            '=' => function ($a, $b) {
+                return is_null($b) ? $a === $b : $a == $b;
+            },
+            '>' => function ($a, $b) {
+                return $a > $b;
+            },
+            '<' => function ($a, $b) {
+                return $a < $b;
+            },
+            '>=' => function ($a, $b) {
+                return $a >= $b;
+            },
+            '<=' => function ($a, $b) {
+                return $a <= $b;
+            },
             '<>' => $not,
             '!=' => $not,
             'LIKE' => $like,
-            'NOT LIKE' => function($a,$b)use($like){return !$like($a,$b);},
+            'NOT LIKE' => function ($a, $b) use ($like) {
+                return !$like($a, $b);
+            },
             'LIKE BINARY' => $likeBinary,
-            'NOT LIKE BINARY' => function($a,$b)use($likeBinary){return !$likeBinary($a,$b);},
+            'NOT LIKE BINARY' => function ($a, $b) use ($likeBinary) {
+                return !$likeBinary($a, $b);
+            },
             'IN' => $in,
-            'NOT IN' => function($a,$b)use($in){return !$in($a,$b);},
+            'NOT IN' => function ($a, $b) use ($in) {
+                return !$in($a, $b);
+            },
             'AGAINST' => $like,
-            'IS' => function($a,$b){return $a === $b;},
-            'IS NOT' => function($a,$b){return $a !== $b;},
+            'IS' => function ($a, $b) {
+                return $a === $b;
+            },
+            'IS NOT' => function ($a, $b) {
+                return $a !== $b;
+            },
         ];
     }
 
@@ -104,7 +129,8 @@ class LinqDataQuery extends DataQuery {
     {
         // TODO try to get a class based on the contents of $this->source
         $dummyDataObject = new class extends DataObject {
-            public function dbObject($fieldName) {
+            public function dbObject($fieldName)
+            {
                 return DBField::create_field('Text', '', $fieldName);
             }
         };
@@ -117,7 +143,8 @@ class LinqDataQuery extends DataQuery {
      * @see \SilverStripe\ORM\DataQuery::applyRelation()
      * @see \SilverStripe\ORM\Filters\ExactMatchFilter::oneFilter
      */
-    public function applyRelation($relation, $linearOnly = false) {
+    public function applyRelation($relation, $linearOnly = false)
+    {
         return $this->dataClass();
     }
 
@@ -125,7 +152,8 @@ class LinqDataQuery extends DataQuery {
      * Get the source for this query.
      * @return array|\Iterator|\IteratorAggregate|\Traversable|Enumerable
      */
-    public function getSource() {
+    public function getSource()
+    {
         return $this->source;
     }
 
@@ -133,7 +161,8 @@ class LinqDataQuery extends DataQuery {
      * Set the source for this query.
      * @param array|\Iterator|\IteratorAggregate|\Traversable|Enumerable $source
      */
-    public function setSource($source) {
+    public function setSource($source)
+    {
         $this->source = $source;
     }
 
@@ -143,7 +172,8 @@ class LinqDataQuery extends DataQuery {
      * @throws \InvalidArgumentException if a given SQL statement is not supported.
      * @see \SilverStripe\ORM\DataQuery::where()
      */
-    public function where($filter) {
+    public function where($filter)
+    {
         if ($filter instanceof LinqDataQuery) {
             $this->where = array_merge($this->where, $filter->where);
             return $this;
@@ -164,7 +194,6 @@ class LinqDataQuery extends DataQuery {
             for ($i = 0; $i < count($matches[0]); $i++) {
                 $this->where[] = $this->prepareWhereClosure($matches['field'][$i], $matches['operator'][$i], $value[$i]);
             }
-
         }
         return $this;
     }
@@ -195,7 +224,6 @@ class LinqDataQuery extends DataQuery {
             for ($i = 0; $i < count($matches[0]); $i++) {
                 $whereAny[] = $this->prepareWhereClosure($matches['field'][$i], $matches['operator'][$i], $value[$i]);
             }
-
         }
         // Create a LINQ closure which returns true if any of the closures in $whereAny return true.
         $this->where[] = $this->wrapClosures($whereAny);
@@ -203,7 +231,8 @@ class LinqDataQuery extends DataQuery {
         return $this;
     }
 
-    protected function findSqlMatches($key, &$value, &$matches) {
+    protected function findSqlMatches($key, &$value, &$matches)
+    {
         if (!is_array($value)) {
             $value = [$value];
         }
@@ -226,8 +255,9 @@ class LinqDataQuery extends DataQuery {
         }
     }
 
-    protected function wrapClosures($closures) {
-        return function($obj) use ($closures) {
+    protected function wrapClosures($closures)
+    {
+        return function ($obj) use ($closures) {
             foreach ($closures as $closure) {
                 if ($closure($obj)) {
                     return true;
@@ -245,15 +275,16 @@ class LinqDataQuery extends DataQuery {
      * @throws \InvalidArgumentException if a given SQL statement is not supported.
      * @return \Closure
      */
-    protected function prepareWhereClosure($fieldName, $operator, $compareTo) {
+    protected function prepareWhereClosure($fieldName, $operator, $compareTo)
+    {
         if (array_key_exists($operator, $this->operatorMethods)) {
             $closure = $this->operatorMethods[$operator];
-            return function($obj) use ($closure, $fieldName, $compareTo) {
+            return function ($obj) use ($closure, $fieldName, $compareTo) {
                 if (is_array($obj)) {
                     if (isset($obj[$fieldName])) {
                         $value = $obj[$fieldName];
                     }
-                } else if (property_exists($obj, $fieldName) || isset($obj->$fieldName)) {
+                } elseif (property_exists($obj, $fieldName) || isset($obj->$fieldName)) {
                     $value = $obj->$fieldName;
                 }
                 if (!array_key_exists('value', get_defined_vars())) {
@@ -282,7 +313,8 @@ class LinqDataQuery extends DataQuery {
      * {@inheritDoc}
      * @see \SilverStripe\ORM\DataQuery::getFinalisedQuery()
      */
-    public function getFinalisedQuery($queriedColumns = NULL) {
+    public function getFinalisedQuery($queriedColumns = null)
+    {
         $list = Enumerable::from($this->getSource());
 
         foreach ($this->where as $closure) {
@@ -316,7 +348,7 @@ class LinqDataQuery extends DataQuery {
      */
     public function max($field)
     {
-        return $this->getFinalisedQuery()->max(function($obj) use ($field){
+        return $this->getFinalisedQuery()->max(function ($obj) use ($field) {
             return is_array($obj) ? $obj[$field] : $obj->$field;
         });
     }
@@ -327,7 +359,7 @@ class LinqDataQuery extends DataQuery {
      */
     public function min($field)
     {
-        return $this->getFinalisedQuery()->min(function($obj) use ($field){
+        return $this->getFinalisedQuery()->min(function ($obj) use ($field) {
             return is_array($obj) ? $obj[$field] : $obj->$field;
         });
     }
@@ -338,7 +370,7 @@ class LinqDataQuery extends DataQuery {
      */
     public function avg($field)
     {
-        return $this->getFinalisedQuery()->average(function($obj) use ($field){
+        return $this->getFinalisedQuery()->average(function ($obj) use ($field) {
             return is_array($obj) ? $obj[$field] : $obj->$field;
         });
     }
@@ -349,7 +381,7 @@ class LinqDataQuery extends DataQuery {
      */
     public function sum($field)
     {
-        return $this->getFinalisedQuery()->sum(function($obj) use ($field){
+        return $this->getFinalisedQuery()->sum(function ($obj) use ($field) {
             return is_array($obj) ? $obj[$field] : $obj->$field;
         });
     }
@@ -360,7 +392,8 @@ class LinqDataQuery extends DataQuery {
      * @throws \BadMethodCallException
      * @see \SilverStripe\ORM\DataQuery::removeFilterOn()
      */
-    public function removeFilterOn($fieldExpression) {
+    public function removeFilterOn($fieldExpression)
+    {
         throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
     }
 
@@ -426,7 +459,8 @@ class LinqDataQuery extends DataQuery {
      * @throws \BadMethodCallException
      * @see \SilverStripe\ORM\DataQuery::having()
      */
-    public function having($having) {
+    public function having($having)
+    {
         // TODO consider implementing this method.
         throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
     }
@@ -520,7 +554,8 @@ class LinqDataQuery extends DataQuery {
      * @throws \BadMethodCallException
      * @see \SilverStripe\ORM\DataQuery::sql()
      */
-    public function sql(&$parameters = []) {
+    public function sql(&$parameters = [])
+    {
         throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
     }
 
@@ -655,6 +690,4 @@ class LinqDataQuery extends DataQuery {
     {
         throw new \BadMethodCallException(__METHOD__ . ' is not implemented.');
     }
-
 }
-

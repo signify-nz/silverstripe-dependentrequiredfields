@@ -5,13 +5,15 @@ namespace Signify\Tests;
 use SilverStripe\Dev\SapphireTest;
 use Signify\ORM\SearchFilterableArrayList;
 
-class SearchFilterableArrayListTest extends SapphireTest {
+class SearchFilterableArrayListTest extends SapphireTest
+{
 
     protected $usesDatabase = false;
 
     protected $objects;
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
         $this->objects = [
             $this->createDummyObject([
@@ -49,7 +51,8 @@ class SearchFilterableArrayListTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testFind() {
+    public function testFind()
+    {
         $list = new SearchFilterableArrayList($this->objects);
 
         // These should all find the object indicated in the variable name.
@@ -74,7 +77,8 @@ class SearchFilterableArrayListTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testFilter() {
+    public function testFilter()
+    {
         $list = new SearchFilterableArrayList($this->objects);
 
         // Filter using the "not" modifier which retains 3 objects.
@@ -111,7 +115,8 @@ class SearchFilterableArrayListTest extends SapphireTest {
         self::assertEmpty($basicFilter2->toArray(), 'All objects are filtered out.');
     }
 
-    public function testFilterAdvanced() {
+    public function testFilterAdvanced()
+    {
         $list = new SearchFilterableArrayList($this->objects);
 
         // Filter testing case sensitivity which retains 1 object.
@@ -180,7 +185,8 @@ class SearchFilterableArrayListTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testFilterAny() {
+    public function testFilterAny()
+    {
         $list = new SearchFilterableArrayList($this->objects);
 
         // FilterAny test that retains 3 objects.
@@ -215,7 +221,8 @@ class SearchFilterableArrayListTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testExclude() {
+    public function testExclude()
+    {
         $list = new SearchFilterableArrayList($this->objects);
 
         // Exclude using the "not" modifier which retains 1 object.
@@ -248,7 +255,8 @@ class SearchFilterableArrayListTest extends SapphireTest {
     /**
      * @useDatabase false
      */
-    public function testExcludeAny() {
+    public function testExcludeAny()
+    {
         $list = new SearchFilterableArrayList($this->objects);
 
         // ExcludeAny test that retains 1 object.
@@ -280,13 +288,12 @@ class SearchFilterableArrayListTest extends SapphireTest {
         self::assertContains('Second Object', $excludeAny3Retained);
     }
 
-    protected function createDummyObject($fields) {
+    protected function createDummyObject($fields)
+    {
         $dummyObject = new \stdClass();
         foreach ($fields as $name => $value) {
             $dummyObject->$name = $value;
         }
         return $dummyObject;
     }
-
 }
-

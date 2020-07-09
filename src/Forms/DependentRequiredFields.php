@@ -14,7 +14,8 @@ use Signify\ORM\SearchFilterableArrayList;
  * The validation provided by {@link RequiredFields} still applies if no dependencies
  * are declared for a field.
  */
-class DependentRequiredFields extends RequiredFields {
+class DependentRequiredFields extends RequiredFields
+{
 
     /**
      * Associative list of fields which may be required, depending on some other values.
@@ -43,7 +44,8 @@ class DependentRequiredFields extends RequiredFields {
      *
      * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct([]);
         $args = func_get_args();
         if (isset($args[0]) && is_array($args[0])) {
@@ -65,7 +67,8 @@ class DependentRequiredFields extends RequiredFields {
         }
     }
 
-    public function php($data) {
+    public function php($data)
+    {
         $valid = parent::php($data);
         $fields = $this->form->Fields();
 
@@ -147,6 +150,4 @@ class DependentRequiredFields extends RequiredFields {
 
         return $this;
     }
-
 }
-
