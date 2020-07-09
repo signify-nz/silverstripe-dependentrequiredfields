@@ -4,8 +4,7 @@ namespace Signify\Forms;
 
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\ArrayLib;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\FieldType\DBField;
+use Signify\ORM\SearchFilterableArrayList;
 
 /**
  * Dependent Required Fields allows you to set which fields need to be present before
@@ -15,7 +14,8 @@ use SilverStripe\ORM\FieldType\DBField;
  * The validation provided by {@link RequiredFields} still applies if no dependencies
  * are declared for a field.
  */
-class DependentRequiredFields extends RequiredFields {
+class DependentRequiredFields extends RequiredFields
+{
 
     /**
      * Associative list of fields which may be required, depending on some other values.
@@ -44,7 +44,8 @@ class DependentRequiredFields extends RequiredFields {
      *
      * @link https://docs.silverstripe.org/en/4/developer_guides/model/searchfilters/
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct([]);
         $args = func_get_args();
         if (isset($args[0]) && is_array($args[0])) {
@@ -66,32 +67,35 @@ class DependentRequiredFields extends RequiredFields {
         }
     }
 
-    public function php($data) {
+    public function php($data)
+    {
         $valid = parent::php($data);
         $fields = $this->form->Fields();
 
         foreach ($this->dependentRequired as $fieldName => $filter) {
             $isRequired = false;
-            foreach ($filter as $key => $value) {
+            foreach ($filter as $filterKey => $filterData) {
                 // Field is already required, no need to re-process.
                 if ($isRequired) {
                     break;
                 }
-                $dependencyFieldName = explode(':', $key)[0];
-                $filterKey = str_replace($dependencyFieldName, 'Value', $key);
-                $tempField = DBField::create_field('Varchar', $data[$dependencyFieldName]);
-                $filterList = ArrayList::create([$tempField]);
-                $isRequired = $filterList->filter($filterKey, $value)->count() !== 0;
+                $dependencyFieldName = explode(':', $filterKey)[0];
+                $dependencyValue = isset($data[$dependencyFieldName]) ? $data[$dependencyFieldName] : null;
+                $tempObj = new \stdClass();
+                $tempObj->$dependencyFieldName = $dependencyValue;
+                $filterList = SearchFilterableArrayList::create([$tempObj]);
+                $isRequired = $filterList->filter($filterKey, $filterData)->count() !== 0;
 
                 // Field is required but has no value
                 if ($isRequired && empty($data[$fieldName])) {
                     $formField = $fields->dataFieldByName($fieldName);
+                    $title = ($formField && !empty($formField->Title())) ? $formField->Title() : $fieldName;
                     $errorMessage = _t(
                         'SilverStripe\\Forms\\Form.FIELDISREQUIRED',
                         '{name} is required',
                         [
                             'name' => strip_tags(
-                                '"' . ($formField->Title() ? $formField->Title() : $fieldName) . '"'
+                                '"' . $title . '"'
                             )
                         ]
                     );
@@ -146,6 +150,4 @@ class DependentRequiredFields extends RequiredFields {
 
         return $this;
     }
-
 }
-

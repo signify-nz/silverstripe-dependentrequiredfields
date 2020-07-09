@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/signify-nz/silverstripe-dependentrequiredfields.svg?branch=master)](https://travis-ci.org/signify-nz/silverstripe-dependentrequiredfields)
 # Dependent Required Fields
 
 The Dependent Required Fields module provides a validator which extends RequiredFields and allows for fields to be required based on the values of other fields.
@@ -15,6 +16,14 @@ __Composer:__
 ```
     composer require signify-nz/silverstripe-dependentrequiredfields
 ```
+
+## Documentaion
+No configuration is required. See Example Usage below for an example of how this validator is used.
+
+* [Changelog](CHANGELOG.md)
+* [Contributing](CONTRIBUTING.md)
+* [Issues](https://github.com/signify-nz/silverstripe-dependentrequiredfields/issues)
+* [License](LICENSE.md)
 
 ## Example Usage
 In the below example, we have fields with various levels of dependency on whether they are required or not.  

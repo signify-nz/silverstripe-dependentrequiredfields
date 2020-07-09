@@ -28,7 +28,8 @@
     },
     "require": {
         "silverstripe/framework": "^4.0",
-        "silverstripe/vendor-plugin": "^1.0"
+        "silverstripe/vendor-plugin": "^1.0",
+        "athari/yalinqo": "^2.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7",
