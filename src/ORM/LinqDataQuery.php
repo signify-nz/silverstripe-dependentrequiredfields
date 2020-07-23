@@ -43,7 +43,7 @@ class LinqDataQuery extends DataQuery
      * @var string
      */
     protected $whereRegex = '/(MATCH \()?"(?<field>[a-zA-Z0-9_-]+?)"(?(1)\)|) '
-    . '(?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>\(?(\?|\?, ?|NULL)+\)?)'
+    . '(?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>\(?([\?, ]|NULL)+\)?)'
     . ' ?(?<connection>OR|AND)?/';
 
     /**
