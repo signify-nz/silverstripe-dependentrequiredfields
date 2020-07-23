@@ -73,10 +73,10 @@ class DependentRequiredFields extends RequiredFields
         $fields = $this->form->Fields();
 
         foreach ($this->dependentRequired as $fieldName => $filter) {
-            $isRequired = false;
+            $isRequired = true;
             foreach ($filter as $filterKey => $filterData) {
-                // Field is already required, no need to re-process.
-                if ($isRequired) {
+                // Field is already not required, no need to re-process.
+                if (!$isRequired) {
                     break;
                 }
                 $dependencyFieldName = explode(':', $filterKey)[0];
@@ -85,27 +85,30 @@ class DependentRequiredFields extends RequiredFields
                 $tempObj->$dependencyFieldName = $dependencyValue;
                 $filterList = SearchFilterableArrayList::create([$tempObj]);
                 $isRequired = $filterList->filter($filterKey, $filterData)->count() !== 0;
-
-                // Field is required but has no value
-                if ($isRequired && empty($data[$fieldName])) {
-                    $formField = $fields->dataFieldByName($fieldName);
-                    $title = ($formField && !empty($formField->Title())) ? $formField->Title() : $fieldName;
-                    $errorMessage = _t(
-                        'SilverStripe\\Forms\\Form.FIELDISREQUIRED',
-                        '{name} is required',
-                        [
-                            'name' => strip_tags(
-                                '"' . $title . '"'
-                            )
-                        ]
-                    );
-                    $this->validationError(
-                        $fieldName,
-                        $errorMessage,
-                        "required"
-                    );
-                    $valid = false;
+                if ($fieldName != 'AdditionalAttendants') {
+//                     var_dump([$isRequired, $tempObj, $filterData, $filterKey]);die();
                 }
+            }
+
+            // Field is required but has no value
+            if ($isRequired && empty($data[$fieldName])) {
+                $formField = $fields->dataFieldByName($fieldName);
+                $title = ($formField && !empty($formField->Title())) ? $formField->Title() : $fieldName;
+                $errorMessage = _t(
+                    'SilverStripe\\Forms\\Form.FIELDISREQUIRED',
+                    '{name} is required',
+                    [
+                        'name' => strip_tags(
+                            '"' . $title . '"'
+                            )
+                    ]
+                    );
+                $this->validationError(
+                    $fieldName,
+                    $errorMessage,
+                    "required"
+                    );
+                $valid = false;
             }
         }
 
