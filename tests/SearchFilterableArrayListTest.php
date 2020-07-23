@@ -234,7 +234,7 @@ class SearchFilterableArrayListTest extends SapphireTest
         self::assertCount(1, $notExclude1Retained, 'One object remains in the list.');
         self::assertContains('First Object', $notExclude1Retained);
 
-        // Exclude using the "not" modifier which returns an empty list.
+        // Exclude using the "not" modifier which returns two items.
         $notExclude2 = $list->exclude([
             'Title:not' => 'First Object',
             'Title:ExactMatch:not' => 'Second Object',
