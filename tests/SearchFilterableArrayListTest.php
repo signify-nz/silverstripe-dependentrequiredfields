@@ -115,6 +115,9 @@ class SearchFilterableArrayListTest extends SapphireTest
         self::assertEmpty($basicFilter2->toArray(), 'All objects are filtered out.');
     }
 
+    /**
+     * @useDatabase false
+     */
     public function testFilterAdvanced()
     {
         $list = new SearchFilterableArrayList($this->objects);
