@@ -184,6 +184,30 @@ class SearchFilterableArrayListTest extends SapphireTest
         ]);
         self::assertEmpty($greaterLesserFilter5->toArray(), 'All objects are filtered out.');
     }
+    
+    /**
+     * @useDatabase false
+     */
+    public function testFilterMultipleRequirements()
+    {
+        $list = new SearchFilterableArrayList($this->objects);
+        
+        // Filter testing multiple filter items which retains 1 object.
+        $multiFilter1 = $list->filter([
+          'NoCase:nocase' => 'CASE SENSITIVE',
+          'StartsWithTest:StartsWith' => 'Not',
+        ]);
+        $multiFilter1Retained = $multiFilter1->column('Title');
+        self::assertCount(1, $multiFilter1Retained, 'One object remains in the list.');
+        self::assertContains('Second Object', $multiFilter1Retained);
+        
+        // Filter testing multiple filter items which retains 0 objects.
+        $multiFilter2 = $list->filter([
+          'NoCase:case' => 'CASE SENSITIVE',
+          'StartsWithTest:StartsWith' => 'Not',
+        ]);
+        self::assertEmpty($multiFilter2->toArray(), 'All objects are excluded.');
+    }
 
     /**
      * @useDatabase false
