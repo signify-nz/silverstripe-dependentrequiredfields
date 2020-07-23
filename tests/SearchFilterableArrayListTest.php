@@ -80,7 +80,7 @@ class SearchFilterableArrayListTest extends SapphireTest
     public function testFilter()
     {
         $list = new SearchFilterableArrayList($this->objects);
-
+        
         // Filter using the "not" modifier which retains 3 objects.
         $notFilter1 = $list->filter('Title:not', 'First Object');
         $notFilter1Retained = $notFilter1->column('Title');
@@ -100,7 +100,7 @@ class SearchFilterableArrayListTest extends SapphireTest
         // Filter using the "not" modifier which retains 4 objects.
         $notFilter3 = $list->filter('Title:not', 'No Object');
         self::assertCount(4, $notFilter3->toArray(), 'All objects are retained.');
-
+        
         // Filter to test multiple value arguments which retains two objects.
         $basicFilter1 = $list->filter('Title', ['First Object', 'Second Object']);
         $basicFilter1Retained = $basicFilter1->column('Title');
@@ -114,7 +114,7 @@ class SearchFilterableArrayListTest extends SapphireTest
         ]);
         self::assertEmpty($basicFilter2->toArray(), 'All objects are filtered out.');
     }
-
+    
     /**
      * @useDatabase false
      */
@@ -184,14 +184,14 @@ class SearchFilterableArrayListTest extends SapphireTest
         ]);
         self::assertEmpty($greaterLesserFilter5->toArray(), 'All objects are filtered out.');
     }
-    
+
     /**
      * @useDatabase false
      */
     public function testFilterMultipleRequirements()
     {
         $list = new SearchFilterableArrayList($this->objects);
-        
+
         // Filter testing multiple filter items which retains 1 object.
         $multiFilter1 = $list->filter([
           'NoCase:nocase' => 'CASE SENSITIVE',
@@ -200,7 +200,7 @@ class SearchFilterableArrayListTest extends SapphireTest
         $multiFilter1Retained = $multiFilter1->column('Title');
         self::assertCount(1, $multiFilter1Retained, 'One object remains in the list.');
         self::assertContains('Second Object', $multiFilter1Retained);
-        
+
         // Filter testing multiple filter items which retains 0 objects.
         $multiFilter2 = $list->filter([
           'NoCase:case' => 'CASE SENSITIVE',

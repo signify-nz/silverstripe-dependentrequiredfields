@@ -208,7 +208,11 @@ class LinqDataQuery extends DataQuery
                         }
                     }
                     for ($index = $i; $index <= $i + $numAdditional; $index++) {
-                        $whereAny[] = $this->prepareWhereClosure($matches['field'][$index], $matches['operator'][$index], $value[$index]);
+                        $whereAny[] = $this->prepareWhereClosure(
+                            $matches['field'][$index],
+                            $matches['operator'][$index],
+                            $value[$index]
+                        );
                     }
                     // Create a LINQ closure which returns true if any of the closures in $whereAny return true.
                     $this->where[] = $this->wrapClosures($whereAny);
@@ -272,7 +276,7 @@ class LinqDataQuery extends DataQuery
             if ($placeholder === 'NULL') {
                 // Insert null at the $ith index.
                 array_splice($value, $i, 0, [null]);
-            } else if ($numValues > 1) {
+            } elseif ($numValues > 1) {
                 // Combine values into one index of the array.
                 $value[$count] = array_slice($value, $count, $numValues);
                 // Unset values which are now part of the current $i index of $value

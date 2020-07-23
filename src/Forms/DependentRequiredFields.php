@@ -100,14 +100,14 @@ class DependentRequiredFields extends RequiredFields
                     [
                         'name' => strip_tags(
                             '"' . $title . '"'
-                            )
+                        )
                     ]
-                    );
+                );
                 $this->validationError(
                     $fieldName,
                     $errorMessage,
                     "required"
-                    );
+                );
                 $valid = false;
             }
         }
