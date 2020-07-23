@@ -8,6 +8,7 @@ use SilverStripe\ORM\FieldType\DBField;
 use YaLinqo\Enumerable;
 use SilverStripe\ORM\Queries\SQLSelect;
 use SilverStripe\ORM\DataQueryManipulator;
+use App\Util\SignifyArrayLib;
 
 /**
  * An object representing a query of data from a given source.
@@ -42,7 +43,8 @@ class LinqDataQuery extends DataQuery
      * @var string
      */
     protected $whereRegex = '/(MATCH \()?"(?<field>[a-zA-Z0-9_-]+?)"(?(1)\)|) '
-    . '(?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>\(?[?, ]+\)?)/';
+    . '(?<operator>[a-zA-Z<>!= ]*?) (?<placeholder>\(?([\?, ]|NULL)+\)?)'
+    . ' ?(?<connection>OR|AND)?/';
 
     /**
      * An array of closure templates for where statements.
@@ -193,11 +195,36 @@ class LinqDataQuery extends DataQuery
                 continue;
             }
             for ($i = 0; $i < count($matches[0]); $i++) {
-                $this->where[] = $this->prepareWhereClosure(
-                    $matches['field'][$i],
-                    $matches['operator'][$i],
-                    $value[$i]
-                );
+                // 'OR' queries should be treated as a whereAny query.
+                if ($matches['connection'][$i] === 'OR' && isset($matches[$i + 1])) {
+                    $numAdditional = 1;
+                    $whereAny = array();
+                    $j = $i + 1;
+                    while ($j < count($matches[0])) {
+                        if ($matches['connection'][$j] === 'OR') {
+                            $numAdditional++;
+                        } else {
+                            break;
+                        }
+                    }
+                    for ($index = $i; $index <= $i + $numAdditional; $index++) {
+                        $whereAny[] = $this->prepareWhereClosure(
+                            $matches['field'][$index],
+                            $matches['operator'][$index],
+                            $value[$index]
+                        );
+                    }
+                    // Create a LINQ closure which returns true if any of the closures in $whereAny return true.
+                    $this->where[] = $this->wrapClosures($whereAny);
+                    $i += $numAdditional;
+                } else {
+                    // Add the independent where closure.
+                    $this->where[] = $this->prepareWhereClosure(
+                        $matches['field'][$i],
+                        $matches['operator'][$i],
+                        $value[$i]
+                    );
+                }
             }
         }
         return $this;
@@ -243,10 +270,13 @@ class LinqDataQuery extends DataQuery
         }
         preg_match_all($this->whereRegex, $key, $matches);
         $count = 0;
-        foreach ($matches['placeholder'] as $placeholder) {
+        foreach ($matches['placeholder'] as $i => $placeholder) {
             // Check for values that are actually meant to be an array of values.
             $numValues = substr_count($placeholder, '?');
-            if ($numValues > 1) {
+            if ($placeholder === 'NULL') {
+                // Insert null at the $ith index.
+                array_splice($value, $i, 0, [null]);
+            } elseif ($numValues > 1) {
                 // Combine values into one index of the array.
                 $value[$count] = array_slice($value, $count, $numValues);
                 // Unset values which are now part of the current $i index of $value
