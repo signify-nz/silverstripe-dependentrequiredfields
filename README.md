@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/signify-nz/silverstripe-dependentrequiredfields.svg?branch=master)](https://travis-ci.com/signify-nz/silverstripe-dependentrequiredfields)
+[![codecov](https://codecov.io/gh/signify-nz/silverstripe-dependentrequiredfields/branch/master/graph/badge.svg)](https://codecov.io/gh/signify-nz/silverstripe-dependentrequiredfields)
 # Dependent Required Fields
 
 The Dependent Required Fields module provides a validator which extends RequiredFields and allows for fields to be required based on the values of other fields.
