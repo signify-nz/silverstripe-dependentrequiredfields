@@ -80,7 +80,7 @@ class SearchFilterableArrayListTest extends SapphireTest
     public function testFilter()
     {
         $list = new SearchFilterableArrayList($this->objects);
-        
+
         // Filter using the "not" modifier which retains 3 objects.
         $notFilter1 = $list->filter('Title:not', 'First Object');
         $notFilter1Retained = $notFilter1->column('Title');
@@ -100,7 +100,7 @@ class SearchFilterableArrayListTest extends SapphireTest
         // Filter using the "not" modifier which retains 4 objects.
         $notFilter3 = $list->filter('Title:not', 'No Object');
         self::assertCount(4, $notFilter3->toArray(), 'All objects are retained.');
-        
+
         // Filter to test multiple value arguments which retains two objects.
         $basicFilter1 = $list->filter('Title', ['First Object', 'Second Object']);
         $basicFilter1Retained = $basicFilter1->column('Title');
@@ -114,7 +114,7 @@ class SearchFilterableArrayListTest extends SapphireTest
         ]);
         self::assertEmpty($basicFilter2->toArray(), 'All objects are filtered out.');
     }
-    
+
     /**
      * @useDatabase false
      */
